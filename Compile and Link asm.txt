@@ -1,0 +1,50 @@
+x86 compile
+nasm -f win32 32.asm -o 32.obj (success)
+nasm -f win32 64.asm -o 64.obj (fail)
+
+x64 compile
+nasm -f win64 32.asm -o 32.obj (fail)
+nasm -f win64 64.asm -o 64.obj (success)
+
+linking MinGW
+C:\MinGW\bin\ld.exe 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -mi386pe (success; fail execute 'error 193')
+C:\MinGW\bin\ld.exe 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-i386 (success; fail execute 'error 193')
+C:\MinGW\bin\ld.exe 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-x86-64 (success; fail execute 'error 193')
+C:\MinGW\bin\ld.exe 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -mi386pe (fail "64.obj: file not recognized: file format not recognized")
+C:\MinGW\bin\ld.exe 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-i386 (fail "64.obj: file not recognized: file format not recognized")
+C:\MinGW\bin\ld.exe 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-x86-64 (fail "64.obj: file not recognized: file format not recognized")
+
+linking MinGW-w64
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -mi386pe (fail "i386:x86-64 architecture of input file `C:\Windows\System32\kernel32.dll' is incompatible with i386 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-i386 (fail "i386 architecture of input file `32.obj' is incompatible with i386:x86-64 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-x86-64 (fail "i386 architecture of input file `32.obj' is incompatible with i386:x86-64 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -mi386pe (fail "i386:x86-64 architecture of input file `64.obj' is incompatible with i386 output and i386:x86-64 architecture of input file `C:\Windows\System32\kernel32.dll' is incompatible with i386 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-i386 (success ExitProcess; fail _ExitProcess@4)
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-x86-64 (success ExitProcess; fail _ExitProcess@4)
+
+linking MinGW-w64 in MinGW32 folder
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -mi386pe (fail "i386:x86-64 architecture of input file `C:\Windows\System32\kernel32.dll' is incompatible with i386 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-i386 (fail "i386 architecture of input file `32.obj' is incompatible with i386:x86-64 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 32.obj C:\Windows\System32\kernel32.dll -o 32.exe -b pe-x86-64 (fail "i386 architecture of input file `32.obj' is incompatible with i386:x86-64 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -mi386pe (fail "i386:x86-64 architecture of input file `64.obj' is incompatible with i386 output and i386:x86-64 architecture of input file `C:\Windows\System32\kernel32.dll' is incompatible with i386 output")
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-i386 (success ExitProcess; fail _ExitProcess@4)
+"C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin\ld.exe" 64.obj C:\Windows\System32\kernel32.dll -o 64.exe -b pe-x86-64 (success ExitProcess; fail _ExitProcess@4)
+
+linking with Golink
+D:\Document\Tool\Golink\GoLink.exe 32.obj C:\Windows\System32\kernel32.dll /fo 32.exe /entry _start
+Note: (not in executable format: File format not recognized) in MinGW gdb
+      couldn't be run in MinGW-w64 gdb
+
+D:\Document\Tool\Golink\GoLink.exe 64.obj C:\Windows\System32\kernel32.dll /fo 64.exe /entry _start
+Note: (not in executable format: File format not recognized) in MinGW gdb
+
+linking with Visual Studio link on x86
+link 32.obj kernel32.lib /subsystem:console /machine:x86 /out:32.exe /entry:start
+Note: _ExitProcess@4 work but ExitProcess fail
+      /entry:start but in .asm _start
+      /dynamicbase turned on by default (ASLR), use /dynamicbase:no to turn it off
+
+linking with Visual Studio link on x64
+link 64.obj kernel32.lib /subsystem:console /machine:x64 /out:64.exe /entry:_start
+Note: ExitProcess work but _ExitProcess@4 fail
+      /dynamicbase turned on by default (ASLR), use /dynamicbase:no to turn it off
